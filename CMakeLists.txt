@@ -36,13 +36,15 @@ include_directories(
 link_directories(
 )
 
-add_executable(testSO3 ./test/testSO3.cpp)
+add_executable(testSO3 ./test/SO3.cpp)
+add_executable(testS ./test/S.cpp)
 
-pods_install_executables(testSO3)
+pods_install_executables(testSO3 testS)
 #pods_install_libraries(optRot)
 pods_install_headers(
   ./include/manifold/S.h
+  ./include/manifold/S_impl.hpp
   ./include/manifold/SO3.h
   ./include/manifold/manifold.h
-  ./include/manifold/SO_impl.hpp
+  ./include/manifold/SO3_impl.hpp
   DESTINATION manifold)
