@@ -2,6 +2,7 @@
 #include <Eigen/Dense>
 #include <manifold/manifold.h>
 
+/// Class describing a data point on the sphere in D dimensions
 template<typename T, int D>
 class S : M<T,D> {
  public:
@@ -10,12 +11,25 @@ class S : M<T,D> {
   S(const S<T,D>& other);
   ~S() {};
 
+  Eigen::Matrix<T,D-1,1> Intrinsic(const Eigen::Matrix<T,D,1>& x);
+//  S<T,D> Exp(Eigen::Matrix<T,D-1,1>& x) 
+  S<T,D> Exp(Eigen::Matrix<T,D,1>& x);
+  Eigen::Matrix<T,D,1> Log(const S<T,D>& q);
+//  Eigen::Matrix<T,D-1,1> Log_north(const S<T,D>& q);
+
   const Eigen::Matrix<T,D,1>& vector() const {return x_;}
   Eigen::Matrix<T,D,1>& vector() {return x_;}
   
   Eigen::Matrix<T,D,1> operator-(const S<T,D>& other);
+
+  Matrix<T,D,D> north_R_TpS2() const;
+  static Matrix<T,D,D> rotationFromAtoB(const Matrix<T,D,1>& a, const
+    Matrix<T,D,1>& b, T percentage=1.0);
+  constexpr double MIN_DOT=-0.98;
+  constexpr double MAX_DOT=0.98;
  private:
   Eigen::Matrix<T,D,1> x_;
+  static T invSincDot(T dot);
 };
 
 typedef S<double,2> S2d;
