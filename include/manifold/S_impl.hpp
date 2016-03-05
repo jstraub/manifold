@@ -24,7 +24,7 @@ Eigen::Matrix<T,D,1> S<T,D>::operator-(const S<T,D>& other) {
 }
 
 template<typename T, int D>
-S<T,D> S<T,D>::Exp(Eigen::Matrix<T,D,1>& x) {
+S<T,D> S<T,D>::Exp(const Eigen::Ref<const Eigen::Matrix<T,D,1>>& x) const {
   S<T,D> q;
   T theta = x.norm();
   if (fabs(theta) < 0.05)
@@ -37,8 +37,7 @@ S<T,D> S<T,D>::Exp(Eigen::Matrix<T,D,1>& x) {
 }
 
 template <typename T, int D>
-T S<T,D>::invSincDot(T dot)
-{
+T S<T,D>::invSincDot(T dot) {
   // 2nd order taylor expansions for the limit cases obtained via mathematica
   if(static_cast<T>(MIN_DOT) < dot && dot < static_cast<T>(MAX_DOT))
     return acos(dot)/sqrt(1.-dot*dot);
@@ -51,14 +50,15 @@ T S<T,D>::invSincDot(T dot)
 }
 
 template<typename T, int D>
-Eigen::Matrix<T,D,1> S<T,D>::Log(const S<T,D>& q) {
+Eigen::Matrix<T,D,1> S<T,D>::Log(const S<T,D>& q) const {
   T dot = max(static_cast<T>(-1.0),min(static_cast<T>(1.0),
         p_.dot(q.vector())));
   return (q.vector()-p_*dot)*invSincDot(dot);
 }
 
 template<typename T, int D>
-Eigen::Matrix<T,D-1,1> S<T,D>::Intrinsic(const Eigen::Matrix<T,D,1>& x) {
+Eigen::Matrix<T,D-1,1> S<T,D>::Intrinsic(
+    const Eigen::Ref<const Eigen::Matrix<T,D,1>>& x) const {
 
   Eigen::Matrix<T,D,1> north;
   north.fill(0);
@@ -74,8 +74,13 @@ Eigen::Matrix<T,D-1,1> S<T,D>::Intrinsic(const Eigen::Matrix<T,D,1>& x) {
 }
 
 template <typename T, int D>
-Eigen::Matrix<T,D,D> S<T,D>::north_R_TpS2() const
-{
+S<T,D> S<T,D>::RetractOrtho(
+    const Eigen::Ref<const Eigen::Matrix<T,D,1>>& x) const { 
+  return S<T,D>((p_+x)/(p_+x).norm());
+}
+
+template <typename T, int D>
+Eigen::Matrix<T,D,D> S<T,D>::north_R_TpS2() const {
   Eigen::Matrix<T,D,1> north;
   north.fill(0);
   north(D-1) = 1.;
