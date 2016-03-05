@@ -23,8 +23,13 @@ class S : M<T,D> {
 
   /// Compute the intrisic representation of a vector in TpS which is
   /// D-1 dimensional.
-  Eigen::Matrix<T,D-1,1> Intrinsic(
+  Eigen::Matrix<T,D-1,1> ToIntrinsic(
       const Eigen::Ref<const Eigen::Matrix<T,D,1>>& x) const;
+
+  /// Compute the representation of a vector in TpS in the ambient
+  /// space.
+  Eigen::Matrix<T,D,1> ToAmbient(
+      const Eigen::Ref<const Eigen::Matrix<T,D-1,1>>& xhat) const;
 
   /// Retraction that just orthogonally projects down to the sphere.
   /// A more efficient way of mapping TpS -> S than the Exp map.

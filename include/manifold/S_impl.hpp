@@ -51,13 +51,20 @@ T S<T,D>::invSincDot(T dot) {
 
 template<typename T, int D>
 Eigen::Matrix<T,D,1> S<T,D>::Log(const S<T,D>& q) const {
-  T dot = max(static_cast<T>(-1.0),min(static_cast<T>(1.0),
-        p_.dot(q.vector())));
+  T dot = std::max(static_cast<T>(-1.0), std::min(static_cast<T>(1.0),
+        this->dot(q)));
   return (q.vector()-p_*dot)*invSincDot(dot);
 }
 
 template<typename T, int D>
-Eigen::Matrix<T,D-1,1> S<T,D>::Intrinsic(
+Eigen::Matrix<T,D,1> S<T,D>::ToAmbient(
+    const Eigen::Ref<const Eigen::Matrix<T,D-1,1>>& xhat) const {
+  Eigen::Matrix<T,D,D> R = north_R_TpS2();
+  return R.leftCols(D-1)*xhat + R.rightCols(1);
+}
+
+template<typename T, int D>
+Eigen::Matrix<T,D-1,1> S<T,D>::ToIntrinsic(
     const Eigen::Ref<const Eigen::Matrix<T,D,1>>& x) const {
 
   Eigen::Matrix<T,D,1> north;
@@ -99,7 +106,7 @@ Eigen::Matrix<T,D,D> S<T,D>::rotationFromAtoB(const Eigen::Matrix<T,D,1>& a, con
 //  ASSERT(fabs(dot) <=1.0, "a="<<a.transpose()<<" |.| "<<a.norm()
 //      <<" b="<<b.transpose()<<" |.| "<<b.norm()
 //      <<" -> "<<dot);
-  dot = max(static_cast<T>(-1.0),min(static_cast<T>(1.0),dot));
+  dot = std::max(static_cast<T>(-1.0),std::min(static_cast<T>(1.0),dot));
 //  cout << "dot="<<dot<<" | |"<<fabs(dot+1.)<<endl;
   if(fabs(dot -1.) < 1e-6)
   {
