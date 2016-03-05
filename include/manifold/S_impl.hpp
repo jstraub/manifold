@@ -1,15 +1,15 @@
 
 template<typename T, int D>
-S<T,D>::S() : x_(Eigen::Matrix<T,D,1>::Zero()) {
-  x_(0) = 1.;
+S<T,D>::S() : p_(Eigen::Matrix<T,D,1>::Zero()) {
+  p_(0) = 1.;
 }
 
 template<typename T, int D>
-S<T,D>::S(const Eigen::Matrix<T,D,1>& x) : x_(x)  
+S<T,D>::S(const Eigen::Matrix<T,D,1>& x) : p_(x)  
 {}
 
 template<typename T, int D>
-S<T,D>::S(const S<T,D>& other) : x_(other.x_)  
+S<T,D>::S(const S<T,D>& other) : p_(other.p_)  
 {}
 
 template<typename T, int D>
@@ -29,9 +29,9 @@ S<T,D> S<T,D>::Exp(Eigen::Matrix<T,D,1>& x) {
   T theta = x.norm();
   if (fabs(theta) < 0.05)
   { // handle sin(0)/0
-    q.vector() = p.vector()*cos(theta) + x*(1.-theta*theta/6.); // + O(x^4)
+    q.vector() = p_*cos(theta) + x*(1.-theta*theta/6.); // + O(x^4)
   }else{
-    q.vector() = p.vector()*cos(theta) + x*(sin(theta)/theta);
+    q.vector() = p_*cos(theta) + x*(sin(theta)/theta);
   }
   return q;
 }
@@ -53,43 +53,42 @@ T S<T,D>::invSincDot(T dot)
 template<typename T, int D>
 Eigen::Matrix<T,D,1> S<T,D>::Log(const S<T,D>& q) {
   T dot = max(static_cast<T>(-1.0),min(static_cast<T>(1.0),
-        p.vector().dot(q.vector())));
-  return (q.vector()-p.vector()*dot)*invSincDot(dot);
+        p_.dot(q.vector())));
+  return (q.vector()-p_*dot)*invSincDot(dot);
 }
 
 template<typename T, int D>
-Eigen::Matrix<T,D-1,1> Intrinsic(const Eigen::Matrix<T,D,1>& x) {
+Eigen::Matrix<T,D-1,1> S<T,D>::Intrinsic(const Eigen::Matrix<T,D,1>& x) {
 
   Eigen::Matrix<T,D,1> north;
   north.fill(0);
   north(D-1) = 1.;
 
-  Matrix<T,D,D> northR = north_R_TpS2();
-  Matrix<T,D,1> xhat = (northR * x);
-  if(fabs(xhat(D_-1))>1e-5) 
+  Eigen::Matrix<T,D,1> xhat = (north_R_TpS2() * x);
+  if(fabs(xhat(D-1))>1e-5) 
   {
     // projection to zero last entry
     xhat -= xhat.dot(north)*north;
   }
-  return xhat.topRows<D-1>();
+  return xhat.topRows(D-1);
 }
 
 template <typename T, int D>
-Matrix<T,D,D> S<T,D>::north_R_TpS2() const
+Eigen::Matrix<T,D,D> S<T,D>::north_R_TpS2() const
 {
   Eigen::Matrix<T,D,1> north;
   north.fill(0);
   north(D-1) = 1.;
-  return rotationFromAtoB<T>(p.vector(),north);
+  return rotationFromAtoB(p_,north);
 }
 
 /* rotation from point A to B; percentage specifies how far the rotation will 
  * bring us towards B [0,1] */
 template<typename T, int D>
-Matrix<T,D,D> S<T,D>::rotationFromAtoB(const Matrix<T,D,1>& a, const
-    Matrix<T,D,1>& b, T percentage=1.0)
+Eigen::Matrix<T,D,D> S<T,D>::rotationFromAtoB(const Eigen::Matrix<T,D,1>& a, const
+    Eigen::Matrix<T,D,1>& b, T percentage)
 {
-  Matrix<T,D,D> bRa;
+  Eigen::Matrix<T,D,D> bRa;
    
   T dot = b.transpose()*a;
 //  ASSERT(fabs(dot) <=1.0, "a="<<a.transpose()<<" |.| "<<a.norm()
@@ -100,7 +99,7 @@ Matrix<T,D,D> S<T,D>::rotationFromAtoB(const Matrix<T,D,1>& a, const
   if(fabs(dot -1.) < 1e-6)
   {
     // points are almost the same -> just put identity
-    bRa =  Matrix<T,D,D>::Identity();
+    bRa =  Eigen::Matrix<T,D,D>::Identity();
 //    bRa(0,0) = cos(percentage*M_PI);
 //    bRa(1,1) = cos(percentage*M_PI);
 //    bRa(0,1) = -sin(percentage*M_PI);
@@ -109,7 +108,7 @@ Matrix<T,D,D> S<T,D>::rotationFromAtoB(const Matrix<T,D,1>& a, const
   {
     // direction does not matter since points are on opposing sides of sphere
     // -> pick one and rotate by percentage;
-    bRa = -Matrix<T,D,D>::Identity();
+    bRa = - Eigen::Matrix<T,D,D>::Identity();
     bRa(0,0) = cos(percentage*M_PI*0.5);
     bRa(1,1) = cos(percentage*M_PI*0.5);
     bRa(0,1) = -sin(percentage*M_PI*0.5);
@@ -118,14 +117,14 @@ Matrix<T,D,D> S<T,D>::rotationFromAtoB(const Matrix<T,D,1>& a, const
     T alpha = acos(dot) * percentage;
 //    cout << "alpha="<<alpha<<endl;
 
-    Matrix<T,D,1> c;
+    Eigen::Matrix<T,D,1> c;
     c = a - b*dot;
 //    ASSERT(c.norm() >1e-5, "c="<<c.transpose()<<" |.| "<<c.norm());
     c /= c.norm();
-    Matrix<T,D,D> A = b*c.transpose() - c*b.transpose();
-    Matrix<T,D,D> temp = b*b.transpose() + c*c.transpose(); 
+    Eigen::Matrix<T,D,D> A = b*c.transpose() - c*b.transpose();
+    Eigen::Matrix<T,D,D> temp = b*b.transpose() + c*c.transpose(); 
     T temp2 = cos(alpha)-1.; 
-    bRa = Matrix<T,D,D>::Identity() + sin(alpha)*A + (temp2)*(temp);
+    bRa = Eigen::Matrix<T,D,D>::Identity() + sin(alpha)*A + (temp2)*(temp);
   }
   return bRa;
 }
