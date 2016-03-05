@@ -6,6 +6,10 @@ int main (int argc, char** argv) {
   
   S3d q;
   std::cout << q << std::endl;
+
+  std::cout << q.Exp(Eigen::Vector3d(0.,M_PI/2.,0.)).norm() << std::endl;
+  std::cout << q.Exp(q.ToAmbient(Eigen::Vector2d(0.,M_PI/2.))).norm() << std::endl;
+
   S3d mu;
   mu.vector() << 1./sqrt(2),1./sqrt(2), 0.;
   std::cout << mu << std::endl;

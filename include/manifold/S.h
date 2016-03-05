@@ -37,6 +37,7 @@ class S : M<T,D> {
 
   /// Compute the dot product between two datapoints on the sphere.
   T dot(const S<T,D>& q) { return p_.dot(q.vector()); }
+  T norm() { return p_.norm(); }
 
   /// Give access to the underlying vector.
   const Eigen::Matrix<T,D,1>& vector() const {return p_;}

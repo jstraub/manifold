@@ -1,7 +1,7 @@
 
 template<typename T, int D>
 S<T,D>::S() : p_(Eigen::Matrix<T,D,1>::Zero()) {
-  p_(0) = 1.;
+  p_(D-1) = 1.;
 }
 
 template<typename T, int D>
@@ -60,7 +60,7 @@ template<typename T, int D>
 Eigen::Matrix<T,D,1> S<T,D>::ToAmbient(
     const Eigen::Ref<const Eigen::Matrix<T,D-1,1>>& xhat) const {
   Eigen::Matrix<T,D,D> R = north_R_TpS2();
-  return R.leftCols(D-1)*xhat + R.rightCols(1);
+  return R.leftCols(D-1)*xhat + R.rightCols(1) - p_;
 }
 
 template<typename T, int D>
