@@ -1,4 +1,8 @@
+/* Copyright (c) 2016, Julian Straub <jstraub@csail.mit.edu> Licensed
+ * under the MIT license. See the license file LICENSE.
+ */
 #pragma once
+#include <random>
 #include <Eigen/Dense>
 #include <manifold/manifold.h>
 #include <manifold/SO3.h>
@@ -57,6 +61,9 @@ class S : M<T,D> {
       Eigen::Matrix<T,D,1>& a, const Eigen::Matrix<T,D,1>& b, T
       percentage=1.0);
 
+  /// Sample a random point on the sphere.
+  static S<T,D> Random();
+
   constexpr static double MIN_DOT=-0.98;
   constexpr static double MAX_DOT=0.98;
  private:
@@ -69,6 +76,7 @@ class S : M<T,D> {
 
 typedef S<double,2> S2d;
 typedef S<double,3> S3d;
+typedef S<double,4> S4d;
 
 template<typename T, int D>
 std::ostream& operator<<(std::ostream& out, const S<T,D>& q);

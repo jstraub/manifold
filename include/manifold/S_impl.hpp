@@ -1,3 +1,6 @@
+/* Copyright (c) 2016, Julian Straub <jstraub@csail.mit.edu> Licensed
+ * under the MIT license. See the license file LICENSE.
+ */
 
 template<typename T, int D>
 S<T,D>::S() : p_(Eigen::Matrix<T,D,1>::Zero()) {
@@ -21,6 +24,18 @@ std::ostream& operator<<(std::ostream& out, const S<T,D>& q) {
 template<typename T, int D>
 Eigen::Matrix<T,D,1> S<T,D>::operator-(const S<T,D>& other) {
   return other.Log(*this);  
+}
+
+template<typename T, int D>
+S<T,D> S<T,D>::Random() {
+  Eigen::Matrix<T,D,1> p;
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::normal_distribution<> N(0,1);
+  for (uint32_t i=0; i<D; ++i)
+    p(i) = N(gen);
+  p /= p.norm();
+  return S<T,D>(p);
 }
 
 template<typename T, int D>
@@ -59,7 +74,7 @@ Eigen::Matrix<T,D,1> S<T,D>::Log(const S<T,D>& q) const {
 template<typename T, int D>
 Eigen::Matrix<T,D,1> S<T,D>::ToAmbient(
     const Eigen::Ref<const Eigen::Matrix<T,D-1,1>>& xhat) const {
-  Eigen::Matrix<T,D,D> R = north_R_TpS2();
+  Eigen::Matrix<T,D,D> R = north_R_TpS2().transpose();
   return R.leftCols(D-1)*xhat + R.rightCols(1) - p_;
 }
 
