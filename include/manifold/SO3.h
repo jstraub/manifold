@@ -31,6 +31,12 @@ class SO3 : M<T,3> {
   static Eigen::Matrix<T,3,1> vee(const Eigen::Matrix<T,3,3>& W);
   static Eigen::Matrix<T,3,3> skew(const Eigen::Matrix<T,3,3>& W);
 
+  /// Generator matrices of SO3
+  static Eigen::Matrix<T,3,3> G1();
+  static Eigen::Matrix<T,3,3> G2();
+  static Eigen::Matrix<T,3,3> G3();
+  static Eigen::Matrix<T,3,3> G(uint32_t i);
+
  private:
   Eigen::Matrix<T,3,3> R_;
 

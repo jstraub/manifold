@@ -117,3 +117,39 @@ std::ostream& operator<<(std::ostream& out, const SO3<T>& so3) {
   out << so3.matrix();
   return out;
 }
+
+template<typename T>
+Eigen::Matrix<T,3,3> SO3<T>::G(uint32_t i) {
+  if (i==0)
+    return G1();
+  else if (i==1)
+    return G2();
+  else if (i==2)
+    return G3();
+  std::cout << "not a valid Generator id" << std::endl;
+  return Eigen::Matrix<T,3,3>::Zero();
+}
+
+template<typename T>
+Eigen::Matrix<T,3,3> SO3<T>::G1() {
+  static Eigen::Matrix<T,3,3> G1_ = Eigen::Matrix<T,3,3>::Zero();
+  G1_(2,1) = 1.;
+  G1_(1,2) = -1.;
+  return G1_;
+}
+
+template<typename T>
+Eigen::Matrix<T,3,3> SO3<T>::G2() {
+  static Eigen::Matrix<T,3,3> G2_ = Eigen::Matrix<T,3,3>::Zero();
+  G2_(0,2) = 1.;
+  G2_(2,0) = -1.;
+  return G2_;
+}
+
+template<typename T>
+Eigen::Matrix<T,3,3> SO3<T>::G3() {
+  static Eigen::Matrix<T,3,3> G3_ = Eigen::Matrix<T,3,3>::Zero();
+  G3_(1,0) = 1.;
+  G3_(0,1) = -1.;
+  return G3_;
+}
