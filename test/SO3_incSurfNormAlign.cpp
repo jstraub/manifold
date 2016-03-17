@@ -17,7 +17,7 @@ int main (int argc, char** argv) {
          0, -sin(theta), cos(theta);
   SO3d Rmu(Rmu_);
   SO3d R = Rmu;
-  double tau_R = 0.0000;
+  double tau_R = 1.;
 
   std::vector<S3d> mus; 
   mus.push_back(S3d(Eigen::Vector3d(0.,cos(theta),-sin(theta))));
@@ -62,24 +62,29 @@ int main (int argc, char** argv) {
       break;
   }
 //  std::cout << std::endl << Rmu << std::endl;
-//  std::cout << std::endl << R << std::endl;
+  std::cout << std::endl << R << std::endl;
   std::cout << acos(R.matrix()(1,1))*180/M_PI << std::endl;
 
   std::cout << "Using SO(3) formulation first order" << std::endl;
 
   R = Rmu;
-  delta = 0.1;
+  delta = 0.01;
   f_prev = 1e99;
   f = -tau_R*(Rmu.Inverse() + R).matrix().trace();
   for (uint32_t i=0; i<N; ++i)
     f -= taus[zs[i]]*mus[zs[i]].vector().transpose()*R.matrix()*ns[i].vector();
   std::cout << "f=" << f << std::endl;
-  for (uint32_t it=0; it<100; ++it) {
+  for (uint32_t it=0; it<200; ++it) {
     Eigen::Vector3d J;
-    for (uint32_t l=0; l<3; ++l)
+    for (uint32_t l=0; l<3; ++l) {
       J(l) = -tau_R*(Rmu.Inverse().matrix()*SO3d::G(l)*R.matrix()).trace(); 
+//      std::cout << -tau_R*(Rmu.Inverse().matrix()*R.matrix()*SO3d::G(l)).trace() 
+//        << " " << -tau_R*(Rmu.Inverse().matrix()*SO3d::G(l)*R.matrix()).trace() 
+//        << std::endl;
+//      J(l) = -tau_R*(Rmu.Inverse().matrix()*R.matrix()*SO3d::G(l)).trace(); 
+    }
     for (uint32_t i=0; i<N; ++i) {
-      J -= -mus[zs[i]].vector().transpose()*SO3d::invVee(R.matrix()*ns[i].vector());
+      J -= -taus[zs[i]]*mus[zs[i]].vector().transpose()*SO3d::invVee(R.matrix()*ns[i].vector());
     }
     R += -delta*J;
     f_prev = f;
@@ -91,7 +96,7 @@ int main (int argc, char** argv) {
       break;
   }
 //  std::cout << std::endl << Rmu << std::endl;
-//  std::cout << std::endl << R << std::endl;
+  std::cout << std::endl << R << std::endl;
   std::cout << acos(R.matrix()(1,1))*180/M_PI << std::endl;
 
   std::cout << "Using SO(3) formulation second order" << std::endl;
@@ -130,7 +135,7 @@ int main (int argc, char** argv) {
       break;
   }
 //  std::cout << std::endl << Rmu << std::endl;
-//  std::cout << std::endl << R << std::endl;
+  std::cout << std::endl << R << std::endl;
   std::cout << acos(R.matrix()(1,1))*180/M_PI << std::endl;
 
 }
