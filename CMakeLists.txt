@@ -37,6 +37,7 @@ link_directories(
 )
 
 add_executable(testSO3 ./test/SO3.cpp)
+add_executable(testSO3_incSurfNormAlign ./test/SO3_incSurfNormAlign.cpp)
 add_executable(testS ./test/S.cpp)
 
 pods_install_executables(testSO3 testS)

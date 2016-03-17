@@ -14,6 +14,7 @@ class SO3 : M<T,3> {
   const Eigen::Matrix<T,3,3>& matrix() const { return R_;};
   Eigen::Matrix<T,3,3>& matrix() { return R_;};
 
+  SO3<T> Inverse() const ;
   SO3<T> Exp (const Eigen::Matrix<T,3,1>& w)const ;
   Eigen::Matrix<T,3,1> Log (const SO3<T>& other)const ;
 
@@ -21,7 +22,10 @@ class SO3 : M<T,3> {
 
   Eigen::Matrix<T,3,1> operator-(const SO3<T>& other);
   SO3<T>& operator+=(const SO3<T>& other);
-  const SO3<T> operator+(const SO3<T>& other);
+  const SO3<T> operator+(const SO3<T>& other) const;
+
+  SO3<T>& operator+=(const Eigen::Matrix<T,3,1>& w);
+  const SO3<T> operator+(const Eigen::Matrix<T,3,1>& w);
 
   static Eigen::Matrix<T,3,3> invVee(const Eigen::Matrix<T,3,1>& w);
   static Eigen::Matrix<T,3,1> vee(const Eigen::Matrix<T,3,3>& W);

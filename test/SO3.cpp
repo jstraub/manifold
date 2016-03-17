@@ -30,15 +30,16 @@ int main (int argc, char** argv) {
   
   double delta = 0.1;
   double f_prev = 1e99;
-  double f = (Rmu.matrix().transpose()*R.matrix()).trace();
+  double f = (Rmu.Inverse() + R).matrix().trace();
   std::cout << "f=" << f << std::endl;
   for (uint32_t it=0; it<100; ++it) {
-    Eigen::Matrix3d J = -0.5*(R.matrix().transpose()*Rmu.matrix() - Rmu.matrix().transpose()*R.matrix()); 
+    Eigen::Matrix3d J = -0.5*((R.Inverse() + Rmu).matrix() - (Rmu.Inverse() + R).matrix()); 
     Eigen::Vector3d Jw = SO3d::vee(J);
-    R = R.Exp(-delta*Jw);
+//    R = R.Exp(-delta*Jw);
+    R += -delta*Jw;
 //    std::cout << Jw << std::endl;
     f_prev = f;
-    f = (Rmu.matrix().transpose()*R.matrix()).trace();
+    f = (Rmu.Inverse() + R).matrix().trace();
 //    if ((f_prev - f)/f < 1e-3) 
 //      break;
     std::cout << "f=" << f << " df/f=" << (f_prev - f)/f 

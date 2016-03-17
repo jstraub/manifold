@@ -43,6 +43,11 @@ Eigen::Matrix<T,3,3> SO3<T>::skew(const Eigen::Matrix<T,3,3>& W) {
 }
 
 template<typename T>
+SO3<T> SO3<T>::Inverse() const {
+  return SO3<T>(R_.transpose());
+}
+
+template<typename T>
 SO3<T> SO3<T>::Exp(const Eigen::Matrix<T,3,1>& w) const {
   return SO3<T>(R_*Exp_(w));
 }
@@ -85,8 +90,19 @@ SO3<T>& SO3<T>::operator+=(const SO3<T>& other) {
 }
 
 template<typename T>
-const SO3<T> SO3<T>::operator+(const SO3<T>& other) {
+const SO3<T> SO3<T>::operator+(const SO3<T>& other) const {
   return SO3<T>(*this) += other;
+}
+
+template<typename T>
+SO3<T>& SO3<T>::operator+=(const Eigen::Matrix<T,3,1>& w) {
+  *this = Exp(w);
+  return *this;
+}
+
+template<typename T>
+const SO3<T> SO3<T>::operator+(const Eigen::Matrix<T,3,1>& w) {
+  return SO3<T>(*this) += w;
 }
 
 //template<typename T>
