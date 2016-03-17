@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <Eigen/Dense>
+#include <Eigen/LU>
 #include <manifold/SO3.h>
 #include <manifold/S.h>
 
@@ -60,11 +61,11 @@ int main (int argc, char** argv) {
     if ((f_prev - f)/fabs(f) < 1e-9) 
       break;
   }
-  std::cout << std::endl << Rmu << std::endl;
-  std::cout << std::endl << R << std::endl;
+//  std::cout << std::endl << Rmu << std::endl;
+//  std::cout << std::endl << R << std::endl;
   std::cout << acos(R.matrix()(1,1))*180/M_PI << std::endl;
 
-  std::cout << "Using SO(3) formulation by Eade" << std::endl;
+  std::cout << "Using SO(3) formulation first order" << std::endl;
 
   R = Rmu;
   delta = 0.1;
@@ -89,8 +90,47 @@ int main (int argc, char** argv) {
     if ((f_prev - f)/fabs(f) < 1e-9) 
       break;
   }
-  std::cout << std::endl << Rmu << std::endl;
-  std::cout << std::endl << R << std::endl;
+//  std::cout << std::endl << Rmu << std::endl;
+//  std::cout << std::endl << R << std::endl;
+  std::cout << acos(R.matrix()(1,1))*180/M_PI << std::endl;
+
+  std::cout << "Using SO(3) formulation second order" << std::endl;
+
+  R = Rmu;
+  delta = 1.;
+  f_prev = 1e99;
+  f = -tau_R*(Rmu.Inverse() + R).matrix().trace();
+  for (uint32_t i=0; i<N; ++i)
+    f -= taus[zs[i]]*mus[zs[i]].vector().transpose()*R.matrix()*ns[i].vector();
+  std::cout << "f=" << f << std::endl;
+  for (uint32_t it=0; it<100; ++it) {
+    Eigen::Vector3d J;
+    for (uint32_t l=0; l<3; ++l)
+      J(l) = -tau_R*(Rmu.Inverse().matrix()*SO3d::G(l)*R.matrix()).trace(); 
+    for (uint32_t i=0; i<N; ++i) {
+      J -= -taus[zs[i]]*mus[zs[i]].vector().transpose()*SO3d::invVee(R.matrix()*ns[i].vector());
+    }
+    Eigen::Matrix3d H;
+    for (uint32_t l=0; l<3; ++l)
+      for (uint32_t m=0; m<3; ++m)
+        H(l,m) = -tau_R*(Rmu.Inverse().matrix()*SO3d::G(l)*SO3d::G(m)*R.matrix()).trace(); 
+    for (uint32_t i=0; i<N; ++i) {
+      for (uint32_t l=0; l<3; ++l)
+        for (uint32_t m=0; m<3; ++m)
+          H(l,m) -= -taus[zs[i]]*mus[zs[i]].vector().transpose()*SO3d::G(l)*SO3d::G(m)*R.matrix()*ns[i].vector();
+    }
+    Eigen::Vector3d xi = - H.lu().solve(J);
+    R += -delta*xi;
+    f_prev = f;
+    f = -tau_R*(Rmu.Inverse() + R).matrix().trace();
+    for (uint32_t i=0; i<N; ++i)
+      f -= taus[zs[i]]*mus[zs[i]].vector().transpose()*R.matrix()*ns[i].vector();
+    std::cout << "@" << it << ": f=" << f << " df/f=" << (f_prev - f)/fabs(f) << std::endl;
+    if ((f_prev - f)/fabs(f) < 1e-9) 
+      break;
+  }
+//  std::cout << std::endl << Rmu << std::endl;
+//  std::cout << std::endl << R << std::endl;
   std::cout << acos(R.matrix()(1,1))*180/M_PI << std::endl;
 
 }
