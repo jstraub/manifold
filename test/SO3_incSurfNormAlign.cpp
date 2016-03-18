@@ -10,14 +10,14 @@ int main (int argc, char** argv) {
   uint32_t N = 10;
   uint32_t K = 2;
   
-  double theta = -1.*M_PI/180.;
+  double theta = 0.*M_PI/180.;
   Eigen::Matrix3d Rmu_;
   Rmu_ << 1, 0, 0,
          0, cos(theta), sin(theta),
          0, -sin(theta), cos(theta);
   SO3d Rmu(Rmu_);
   SO3d R = Rmu;
-  double tau_R = 1.;
+  double tau_R = 10.;
 
   std::vector<S3d> mus; 
   mus.push_back(S3d(Eigen::Vector3d(0.,cos(theta),-sin(theta))));
@@ -26,7 +26,7 @@ int main (int argc, char** argv) {
   taus.push_back(10.);
   taus.push_back(10.);
 
-  theta = 45.*M_PI/180.;
+  theta = 15.*M_PI/180.;
   std::vector<S3d> ns; 
   std::vector<uint32_t> zs;
   for (uint32_t i=0; i<N/2; ++i) {
@@ -102,7 +102,7 @@ int main (int argc, char** argv) {
   std::cout << "Using SO(3) formulation second order" << std::endl;
 
   R = Rmu;
-  delta = 1.;
+  delta = 0.9;
   f_prev = 1e99;
   f = -tau_R*(Rmu.Inverse() + R).matrix().trace();
   for (uint32_t i=0; i<N; ++i)
@@ -122,10 +122,10 @@ int main (int argc, char** argv) {
     for (uint32_t i=0; i<N; ++i) {
       for (uint32_t l=0; l<3; ++l)
         for (uint32_t m=0; m<3; ++m)
-          H(l,m) -= -taus[zs[i]]*mus[zs[i]].vector().transpose()*SO3d::G(l)*SO3d::G(m)*R.matrix()*ns[i].vector();
+          H(l,m) += -taus[zs[i]]*mus[zs[i]].vector().transpose()*SO3d::G(l)*SO3d::G(m)*R.matrix()*ns[i].vector();
     }
     Eigen::Vector3d xi = - H.lu().solve(J);
-    R += -delta*xi;
+    R += delta*xi;
     f_prev = f;
     f = -tau_R*(Rmu.Inverse() + R).matrix().trace();
     for (uint32_t i=0; i<N; ++i)
