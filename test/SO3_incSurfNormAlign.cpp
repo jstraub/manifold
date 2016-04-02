@@ -118,15 +118,13 @@ int main (int argc, char** argv) {
     Eigen::Matrix3d H;
     for (uint32_t l=0; l<3; ++l)
       for (uint32_t m=0; m<3; ++m) {
-        Eigen::Matrix3d Glmml = (SO3d::G(l)*SO3d::G(m)+SO3d::G(m)*SO3d::G(l));
-//        H(l,m) = -tau_R*(Rmu.Inverse().matrix()*SO3d::G(l)*SO3d::G(m)*R.matrix()).trace(); 
+        Eigen::Matrix3d Glmml = 0.5*(SO3d::G(l)*SO3d::G(m)+SO3d::G(m)*SO3d::G(l));
         H(l,m) = -tau_R*(Rmu.Inverse().matrix()*R.matrix()*Glmml).trace(); 
       }
     for (uint32_t i=0; i<N; ++i) {
       for (uint32_t l=0; l<3; ++l)
         for (uint32_t m=0; m<3; ++m) {
-          Eigen::Matrix3d Glmml = (SO3d::G(l)*SO3d::G(m)+SO3d::G(m)*SO3d::G(l));
-//          H(l,m) += -taus[zs[i]]*mus[zs[i]].vector().transpose()*SO3d::G(l)*SO3d::G(m)*R.matrix()*ns[i].vector();
+          Eigen::Matrix3d Glmml = 0.5*(SO3d::G(l)*SO3d::G(m)+SO3d::G(m)*SO3d::G(l));
           H(l,m) += -taus[zs[i]]*mus[zs[i]].vector().transpose()*R.matrix()*Glmml*ns[i].vector();
         }
     }
