@@ -150,7 +150,7 @@ int main (int argc, char** argv) {
   mus.push_back(Eigen::Vector3f(0.3,0.3,0.3));
 
   double theta = 15.*M_PI/180.;
-  double phi = 5*M_PI/180.;
+  double phi = 25*M_PI/180.;
   std::vector<Eigen::Vector3f> ps; 
   std::vector<uint32_t> zs;
   Eigen::Vector3f t_true = Eigen::Vector3f(0.1,.1,0.1);
