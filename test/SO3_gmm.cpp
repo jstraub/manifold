@@ -129,8 +129,8 @@ int main (int argc, char** argv) {
   tau_R_ = 0.00001;
   Sigma_t_ = 10000.*Eigen::Matrix3f::Identity();
 
-  uint32_t N = 30;
-  uint32_t K = 3;
+  uint32_t K = 4;
+  uint32_t N = 40;
   
   double theta0 = 0.*M_PI/180.;
   Eigen::Matrix3f Rmu;
@@ -147,12 +147,13 @@ int main (int argc, char** argv) {
   mus.push_back(Eigen::Vector3f(1.,0.,0.));
   mus.push_back(Eigen::Vector3f(0.,1.,0.));
   mus.push_back(Eigen::Vector3f(0.,0.,1.));
+  mus.push_back(Eigen::Vector3f(0.3,0.3,0.3));
 
   double theta = 15.*M_PI/180.;
-  double phi = 45*M_PI/180.;
+  double phi = 5*M_PI/180.;
   std::vector<Eigen::Vector3f> ps; 
   std::vector<uint32_t> zs;
-  Eigen::Vector3f t_true = Eigen::Vector3f(0.,0.,1.);
+  Eigen::Vector3f t_true = Eigen::Vector3f(0.1,.1,0.1);
   Eigen::Matrix3f R_true;
   R_true << 1, 0, 0,
             0,  cos(theta), sin(theta),
@@ -166,16 +167,19 @@ int main (int argc, char** argv) {
 //            sin(theta)*sin(phi), cos(theta)*sin(phi), cos(phi),
 //            cos(theta), -sin(theta), 0.;
 
-  for (uint32_t i=0; i<N/3; ++i) {
+  for (uint32_t i=0; i<N/K; ++i) {
     ps.push_back(Eigen::Vector3f(1.,0,0));
     ps.back() = R_true*ps.back() + t_true;
     ps.push_back(Eigen::Vector3f(0,1.,0.));
     ps.back() = R_true*ps.back() + t_true;
     ps.push_back(Eigen::Vector3f(0,0.,1.));
     ps.back() = R_true*ps.back() + t_true;
+    ps.push_back(Eigen::Vector3f(0.3,0.3,0.3));
+    ps.back() = R_true*ps.back() + t_true;
     zs.push_back(0);
     zs.push_back(1);
     zs.push_back(2);
+    zs.push_back(3);
   }
 
   std::vector<Stats> ss(K);
@@ -323,6 +327,7 @@ int main (int argc, char** argv) {
     if(it < 10) {
       std::cout << J.transpose() << std::endl;
       std::cout << H << std::endl;
+      std::cout << - H.ldlt().solve(J).transpose() << std::endl;
     }
 //    std::cout << H << std::endl;
 //    std::cout << "J " << J.transpose() << std::endl;
@@ -383,6 +388,8 @@ int main (int argc, char** argv) {
   std::cout << "f=" << f << std::endl;
   tPrev = t;
   RPrev = R;
+  std::cout << " -- d angle " << acos(((R*R_true).trace()-1)*0.5)*180./M_PI 
+    << " |dt| " << (t_true - (-R.transpose()*t)).sum() << std::endl;
   for (uint32_t it=0; it<2000; ++it) {
     Eigen::Matrix<float,6,1> J = OdomJacobian(t, t_prev, R, Rmu);
     Eigen::Matrix<float,6,6> H = OdomHessian(t, t_prev, R, Rmu);
@@ -394,6 +401,7 @@ int main (int argc, char** argv) {
     if(it < 10) {
       std::cout << J.transpose() << std::endl;
       std::cout << H << std::endl;
+      std::cout << - H.ldlt().solve(J).transpose() << std::endl;
     }
 //    std::cout << H << std::endl;
 //    std::cout << "J " << J.transpose() << std::endl;
@@ -415,8 +423,11 @@ int main (int argc, char** argv) {
       const Eigen::Vector3f x = R*ps[i]+t-mus[zs[i]];
       f += 0.5*x.dot(covInv*x);
     }
-    if (it%100==0) 
+    if (it%1==0) {
       std::cout << "@" << it << ": f=" << f << " df/f=" << (f_prev - f)/fabs(f) << std::endl;
+      std::cout << " -- d angle " << acos(std::min(1.,((R*R_true).trace()-1)*0.5))*180./M_PI 
+        << " |dt| " << (t_true - (-R.transpose()*t)).sum() << std::endl;
+    }
     if ((f_prev - f)/fabs(f) < 1e-9) {
       std::cout << "@" << it << ": f=" << f << " f_prev=" << f_prev << " df/f=" << (f_prev - f)/fabs(f) << std::endl;
       break;
