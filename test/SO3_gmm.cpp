@@ -63,7 +63,7 @@ void AddObsHessian(
 
   for (uint32_t l=0; l<3; ++l) for (uint32_t m=0; m<3; ++m) {
     Eigen::Matrix3f Glmml = (Gs_[l]*Gs_[m] + Gs_[m]*Gs_[l]);
-    H(l+3,m+3) += w*(y.dot(Gs_[l].transpose()*covInv*Gs_[m]*y)
+    H(l+3,m+3) += w*(-y.dot(Gs_[l]*covInv*Gs_[m]*y)
 //        + 2.*y.dot(covInv*Glmml*y) 
         +0.5*x.dot(covInv*Glmml*y));
   }
