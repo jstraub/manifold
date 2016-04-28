@@ -2,22 +2,26 @@
 #include <iostream>
 #include <Eigen/Dense>
 #include <manifold/SO3.h>
-#include <manifold/gradienDescentSO3.h>
+#include <manifold/gradientDescentSO3.h>
 
 class GDSO3vMF : public GDSO3<double> {
  public:
   GDSO3vMF(const SO3d& Rmu) : Rmu_(Rmu) 
   {};
 
-  virtual void ComputeJacobian(Eigen::Matrix<T,D,1>* J, T* f) {
-    SO3d R = theta_;
+  virtual void ComputeJacobian(const SO3d& theta, Eigen::Matrix<double,3,1>* J, double* f) {
+    SO3d R = theta;
     if (J) {
       Eigen::Matrix3d JMat = -0.5*((R.Inverse() + Rmu_).matrix() 
           - (Rmu_.Inverse() + R).matrix()); 
       *J = SO3d::vee(JMat);
+//      std::cout << R << std::endl;
+//      std::cout << Rmu_ << std::endl;
+//      std::cout << JMat << std::endl;
+//      std::cout << J->transpose() << std::endl;
     }
     if (f) {
-      *f = (Rmu_.Inverse() + R).matrix().trace();
+      *f = -(Rmu_.Inverse() + R).matrix().trace();
     }
   };
  protected:
@@ -50,6 +54,7 @@ int main (int argc, char** argv) {
 
   GDSO3vMF gd(Rmu);
   gd.Compute(R, 1e-5, 100);
+  R = gd.GetMinimum();
   
 //  double delta = 0.1;
 //  double f_prev = 1e99;

@@ -9,7 +9,7 @@
 
 /// Class describing a data point on the sphere in D dimensions.
 template<typename T, int D>
-class S : M<T,D> {
+class S : Manifold<T,D> {
  public:
   S();
   S(const Eigen::Matrix<T,D,1>& x);

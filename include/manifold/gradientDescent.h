@@ -3,17 +3,17 @@
 #include <Eigen/Dense>
 #include <manifold/manifold.h>
 
-template<typename T, uint32_t D, Manifold<T,D> M>
+template<typename T, uint32_t D, class M>
 class GD {
  public:
-  GD() {};
+  GD();
   virtual ~GD() {};
 
   virtual void Compute(const M& theta0, T thr, uint32_t itMax);
 
-  virtual void ComputeJacobian(Eigen::Matrix<T,D,1>* J, T* f) = 0;
+  virtual void ComputeJacobian(const M& theta, Eigen::Matrix<T,D,1>* J, T* f) = 0;
 
-  const M& GetState() {return theta_;}
+  const M& GetMinimum() {return theta_;}
  protected:
   T c_;
   T t_;
@@ -21,30 +21,35 @@ class GD {
   void LineSearch(Eigen::Matrix<T,D,1>* J, T* f);
 };
 
-GD::GD() : 
+template<typename T, uint32_t D, class M>
+GD<T,D,M>::GD() : 
   c_(0.1), t_(0.3)
 {}
 
-void LineSearch(Eigen::Matrix<T,D,1>* J, T* f) {
+template<typename T, uint32_t D, class M>
+void GD<T,D,M>::LineSearch(Eigen::Matrix<T,D,1>* J, T* f) {
   T delta = 1.;
-  ComputeJacobian(J, f);
-  T fNew = *f;
   M thetaNew = theta_;
-  Eigen::Matrix<T,D,1> d = - (*J)/J->norm();
+  ComputeJacobian(thetaNew, J, f);
+  T fNew = *f;
+  Eigen::Matrix<T,D,1> d = -(*J)/J->norm();
+  std::cout << J->transpose() << d.transpose() << std::endl;
   T m = J->dot(d);
-  while (f-fNew < -c_*m*delta && delta > 1e-16) {
-    thetaNew += delta*d;
-    ComputeJacobian(NULL, &fNew);
-    std::cout << f-fNew << " <? " << -c_*m*delta 
-      << " fNew=" << fNew << " delta=" << delta << std::endl;
+  while (*f-fNew < -c_*m*delta && delta > 1e-16) {
     delta *= t_;
+    thetaNew = theta_+delta*d;
+    //std::cout << thetaNew << std::endl;
+    ComputeJacobian(thetaNew, NULL, &fNew);
+    std::cout << *f-fNew << " <? " << -c_*m*delta 
+      << " fNew=" << fNew << " delta=" << delta << std::endl;
   }
   *J = delta*d;
   *f = fNew;
 }
 
-void Compute(const M& theta0, T thr, uint32_t itMax) {
-  theta = theta0;
+template<typename T, uint32_t D, class M>
+void GD<T,D,M>::Compute(const M& theta0, T thr, uint32_t itMax) {
+  theta_ = theta0;
   M thetaPrev = theta0;
   Eigen::Matrix<T,D,1> J; 
   J.fill(0.);
@@ -55,9 +60,9 @@ void Compute(const M& theta0, T thr, uint32_t itMax) {
   while((fPrev-f)/fabs(f) > thr && it < itMax) {
     fPrev = f;
     LineSearch(&J, &f);
-//    ComputeJacobian(&J, &f);
+//    ComputeJacobian(theta_, &J, &f);
     thetaPrev = theta_;
-    theta_ += - delta*J;
+    theta_ += J;
     std::cout << "@" << it << " f=" << f 
       << " df/f=" << (fPrev-f)/fabs(f) << std::endl;
     ++it;
