@@ -37,12 +37,11 @@ class SO3 : Manifold<T,3> {
   static Eigen::Matrix<T,3,3> G3();
   static Eigen::Matrix<T,3,3> G(uint32_t i);
 
- private:
-  Eigen::Matrix<T,3,3> R_;
-
   static Eigen::Matrix<T,3,3> Exp_(const Eigen::Matrix<T,3,1>& w);
   static Eigen::Matrix<T,3,1> Log_(const Eigen::Matrix<T,3,3>& R);
-  
+
+ private:
+  Eigen::Matrix<T,3,3> R_;
 };
 
 typedef SO3<double> SO3d;

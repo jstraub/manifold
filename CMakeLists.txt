@@ -38,6 +38,7 @@ link_directories(
 
 add_executable(testSO3GD ./test/SO3GD.cpp)
 add_executable(testSO3 ./test/SO3.cpp)
+add_executable(testSE3 ./test/SE3.cpp)
 add_executable(testSO3_incSurfNormAlign ./test/SO3_incSurfNormAlign.cpp)
 add_executable(testS ./test/S.cpp)
 add_executable(testSO3_gmm ./test/SO3_gmm.cpp)
@@ -48,8 +49,10 @@ pods_install_headers(
   ./include/manifold/S.h
   ./include/manifold/S_impl.hpp
   ./include/manifold/SO3.h
+  ./include/manifold/SE3.h
   ./include/manifold/manifold.h
   ./include/manifold/gradientDescent.h
   ./include/manifold/gradientDescentSO3.h
   ./include/manifold/SO3_impl.hpp
+  ./include/manifold/SE3_impl.hpp
   DESTINATION manifold)
