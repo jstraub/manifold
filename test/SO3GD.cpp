@@ -53,7 +53,7 @@ int main (int argc, char** argv) {
   std::cout << Rmu-R << std::endl;
 
   GDSO3vMF gd(Rmu);
-  gd.Compute(R, 1e-5, 100);
+  gd.Compute(R, 1e-8, 100);
   R = gd.GetMinimum();
   
 //  double delta = 0.1;
