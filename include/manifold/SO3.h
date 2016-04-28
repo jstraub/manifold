@@ -4,7 +4,7 @@
 #include <manifold/manifold.h>
 
 template<typename T>
-class SO3 : M<T,3> {
+class SO3 : Manifold<T,3> {
  public:
   SO3();
   SO3(const Eigen::Matrix<T,3,3>& R);

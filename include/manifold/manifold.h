@@ -2,9 +2,10 @@
 #include <Eigen/Dense>
 
 template<typename T, uint32_t D>
-class M {
+class Manifold {
  public:
-  M() {};
-  virtual ~M() {};
-  
+  Manifold() {};
+
+
+
 };
