@@ -54,6 +54,7 @@ pods_install_headers(
   ./include/manifold/manifold.h
   ./include/manifold/gradientDescent.h
   ./include/manifold/gradientDescentSO3.h
+  ./include/manifold/gradientDescentSE3.h
   ./include/manifold/SO3_impl.hpp
   ./include/manifold/SE3_impl.hpp
   DESTINATION manifold)
