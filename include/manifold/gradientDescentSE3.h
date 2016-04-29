@@ -2,10 +2,11 @@
 #include <iostream>
 #include <Eigen/Dense>
 #include <manifold/manifold.h>
+#include <manifold/SE3.h>
 #include <manifold/gradientDescent.h>
 
 template <typename T>
-class GDSO3 : public GD<T,3,SE3<T>> {
+class GDSE3 : public GD<T,6,SE3<T>> {
  public:
   GDSE3();
   ~GDSE3() {};

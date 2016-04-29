@@ -33,7 +33,8 @@ void GD<T,D,M>::LineSearch(Eigen::Matrix<T,D,1>* J, T* f) {
   ComputeJacobian(thetaNew, J, f);
   T fNew = *f;
   Eigen::Matrix<T,D,1> d = -(*J)/J->norm();
-  std::cout << J->transpose() << d.transpose() << std::endl;
+  std::cout << "\tJ=" << J->transpose() << std::endl
+    << "\td=" << d.transpose() << std::endl;
   T m = J->dot(d);
   while (*f-fNew < -c_*m*delta && delta > 1e-16) {
     delta *= t_;
@@ -41,7 +42,7 @@ void GD<T,D,M>::LineSearch(Eigen::Matrix<T,D,1>* J, T* f) {
     //std::cout << thetaNew << std::endl;
     ComputeJacobian(thetaNew, NULL, &fNew);
     std::cout << *f-fNew << " <? " << -c_*m*delta 
-      << " fNew=" << fNew << " delta=" << delta << std::endl;
+      << "\tfNew=" << fNew << "\tdelta=" << delta << std::endl;
   }
   *J = delta*d;
   *f = fNew;
