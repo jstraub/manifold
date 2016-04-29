@@ -31,6 +31,7 @@ class GDSE3gmm : public GDSE3<double> {
     double logCB = -0.5*log(2.*M_PI)*3-0.5*SB.determinant();
     double logD = log(piA_) + log(piB_) + logCA +logCB;
     double z = -0.5*(t-m).dot(S.ldlt().solve(t-m));
+//    std::cout << "logCA=" << logCA << " logCB=" << logCB << std::endl;
 //    std::cout << "logD=" << logD << " z=" << z 
 //      << " exp(logD+z)=" << exp(logD + z) << std::endl;
     if (J) {
@@ -94,11 +95,12 @@ int main (int argc, char** argv) {
   R << 1, 0, 0,
          0, cos(theta), sin(theta),
          0, -sin(theta), cos(theta);
-  R = Eigen::Matrix3d::Identity();
-  Eigen::Matrix3d covB = Eigen::Vector3d(0.1,10.,10.).asDiagonal();
-  Eigen::Matrix3d covA = R*covB*R.transpose();
+//  R = Eigen::Matrix3d::Identity();
+  Eigen::Vector3d t = Eigen::Vector3d::Ones();
+  Eigen::Matrix3d covA =   Eigen::Vector3d(1.,.1,1.).asDiagonal();
+  Eigen::Matrix3d covB = R*covA*R.transpose();
   Eigen::Vector3d muA = Eigen::Vector3d::Zero();
-  Eigen::Vector3d muB = Eigen::Vector3d::Ones();
+  Eigen::Vector3d muB = R*muA+t;
 
   SE3d T;
 
@@ -106,7 +108,12 @@ int main (int argc, char** argv) {
   gd.Compute(T, 1e-6, 200);
 //  gd.Compute(T, 0, 200);
   T = gd.GetMinimum();
+  Eigen::Vector3d tEst = T.matrix().topRightCorner(3,1);
+  Eigen::Matrix3d REst = T.matrix().topLeftCorner(3,3);
   std::cout << T << std::endl;
   std::cout << R << std::endl;
+  std::cout << REst.transpose() << std::endl;
+  std::cout << (-REst.transpose()*tEst).transpose() << std::endl;
+  std::cout << t.transpose() << std::endl;
   
 }
