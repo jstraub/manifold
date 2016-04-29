@@ -24,7 +24,8 @@ class GDSE3gmm : public GDSE3<double> {
     SE3d T = theta;
     Eigen::Matrix3d R = T.matrix().topLeftCorner(3,3);
     Eigen::Vector3d t = T.matrix().topRightCorner(3,1);
-    Eigen::Vector3d m = R*muB_ - muA_;
+    // TODO: maybe this has to be negated?
+    Eigen::Vector3d m = (R*muB_ - muA_);
     Eigen::Matrix3d SB = R*covB_*R.transpose();
     Eigen::Matrix3d S = covA_+SB;
     double logCA = -0.5*log(2.*M_PI)*3-0.5*covA_.determinant(); 
