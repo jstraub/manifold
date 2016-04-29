@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
 #include <Eigen/Dense>
-#include <manifold/manifold.h>
+#include <manifold/SO3.h>
 #include <manifold/gradientDescent.h>
 
 template <typename T>
