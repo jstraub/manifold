@@ -52,8 +52,7 @@ template<typename T, uint32_t D, class M>
 void GD<T,D,M>::Compute(const M& theta0, T thr, uint32_t itMax) {
   theta_ = theta0;
   M thetaPrev = theta0;
-  Eigen::Matrix<T,D,1> J; 
-  J.fill(0.);
+  Eigen::Matrix<T,D,1> J = Eigen::Matrix<T,D,1>::Zero(); 
   T fPrev = 1e12;
   T f = 1e10;
 //  T delta = 1e-2;
