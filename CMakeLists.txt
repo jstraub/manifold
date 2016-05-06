@@ -44,6 +44,8 @@ add_executable(testSO3_incSurfNormAlign ./test/SO3_incSurfNormAlign.cpp)
 add_executable(testS ./test/S.cpp)
 add_executable(testSO3_gmm ./test/SO3_gmm.cpp)
 
+add_executable(testSE3g2pc ./test/g2pc.cpp)
+
 pods_install_executables(testSO3 testS)
 #pods_install_libraries(optRot)
 pods_install_headers(

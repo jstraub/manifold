@@ -10,7 +10,8 @@ class GDSE3 : public GD<T,6,SE3<T>> {
  public:
   GDSE3();
   ~GDSE3() {};
-  virtual void ComputeJacobian(const SE3<T>& theta, Eigen::Matrix<T,6,1>* J, T* f) = 0;
+  virtual void ComputeJacobian(const SE3<T>& theta,
+      Eigen::Matrix<T,6,1>* J, T* f) = 0;
  protected:
 };
 
