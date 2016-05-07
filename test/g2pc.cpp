@@ -71,6 +71,7 @@ class Gmm2pcNewton : public NewtonSE3<double> {
     Eigen::Matrix3d R = T.matrix().topLeftCorner(3,3);
     Eigen::Vector3d t = T.matrix().topRightCorner(3,1);
     uint32_t N = xB_.cols();
+    if (H) H->fill(0.);
     if (J) J->fill(0.);
     if (f) *f = 0.;
     for (uint32_t i=0; i<N; ++i) {
@@ -80,7 +81,7 @@ class Gmm2pcNewton : public NewtonSE3<double> {
       Eigen::Vector3d a = Rx+t-muA_;
       double z = -0.5*a.dot(covA_.ldlt().solve(a));
       if (H) {
-        H->bottomRightCorner(3,3) -= covA_.inverse();
+        H->topLeftCorner(3,3) -= covA_.inverse();
         for (uint32_t j=0; j<3; ++j) {
           Eigen::Vector3d Htw_j = covA_.ldlt().solve(SO3d::G(j)*Rx);
           H->block<3,1>(0,j+3) -= Htw_j;
@@ -88,7 +89,7 @@ class Gmm2pcNewton : public NewtonSE3<double> {
         }
         for (uint32_t k=0; k<3; ++k) {
           for (uint32_t j=0; j<3; ++j) {
-            (*H)(j,k) -= 0.5*(a.dot(covA_.ldlt().solve((
+            (*H)(3+j,3+k) -= 0.5*(a.dot(covA_.ldlt().solve((
                     SO3d::G(k)*SO3d::G(j)+SO3d::G(j)*SO3d::G(k))*Rx)))
               - Rx.dot(SO3d::G(j)*covA_.ldlt().solve(SO3d::G(k)*Rx));
           }
@@ -104,7 +105,7 @@ class Gmm2pcNewton : public NewtonSE3<double> {
       if (f)
         *f += logD + z;
     }
-    if (H) *H *= 1./N;
+    if (H) *H *= -1./N;
     if (J) *J *= -1./N;
     if (f) *f *= -1./N;
   };

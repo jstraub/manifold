@@ -34,22 +34,25 @@ void Newton<T,D,M>::LineSearch(Eigen::Matrix<T,D,1>* dT, T* f) {
   Eigen::Matrix<T,D,1> J;
   Eigen::Matrix<T,D,D> H;
   ComputeJacobianAndHessian(thetaNew, &H, &J, f);
-  T fNew = *f;
-  Eigen::Matrix<T,D,1> d = -J/J.norm();
-  std::cout << "\tJ=" << J.transpose() << std::endl
-    << "\td=" << d.transpose() << std::endl
-    << "\tH=" << H.determinant() << std::endl;
-  T df = c_*delta*J.dot(d) + c_*delta*c_*delta*0.5*d.dot(H.ldlt().solve(d));
-//  while (*f-fNew < -c_*m*delta && delta > 1e-16) {
+  T fNew = fabs(*f)*1e10; // inflate so that we enter the while loop at least once
+  Eigen::Matrix<T,D,1> d = -H.ldlt().solve(J);
+  d /= d.norm();
+//  std::cout << "\tJ=" << J.transpose() << std::endl
+//    << "\td=" << d.transpose() << std::endl;
+//    << "\tH=" << std::endl << H << std::endl;
+  T df = 0.; // no need to init this yet.
+  uint32_t it = 0;
   while (*f-fNew < -df && delta > 1e-16) {
     delta *= t_;
     thetaNew = theta_+delta*d;
-    //std::cout << thetaNew << std::endl;
     ComputeJacobianAndHessian(thetaNew, NULL, NULL, &fNew);
-    std::cout << *f-fNew << " <? " << -df 
-      << "\tfNew=" << fNew << "\tdelta=" << delta << std::endl;
     df = c_*delta*J.dot(d) + c_*delta*c_*delta*0.5*d.dot(H.ldlt().solve(d));
+//    std::cout << *f-fNew << " <? " << -df 
+//      << "\tfNew=" << fNew << "\tdelta=" << delta << std::endl;
+    ++it;
   }
+  std::cout << "\tlinesearch it=" << it << " df=" << *f-fNew 
+    << " delta=" << delta << std::endl;
   *dT = delta*d;
   *f = fNew;
 }
