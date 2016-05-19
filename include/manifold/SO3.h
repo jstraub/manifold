@@ -40,6 +40,8 @@ class SO3 : Manifold<T,3> {
   static Eigen::Matrix<T,3,3> Exp_(const Eigen::Matrix<T,3,1>& w);
   static Eigen::Matrix<T,3,1> Log_(const Eigen::Matrix<T,3,3>& R);
 
+  static SO3<T> Random();
+
  private:
   Eigen::Matrix<T,3,3> R_;
 };
@@ -48,6 +50,8 @@ typedef SO3<double> SO3d;
 typedef SO3<float> SO3f;
 
 template<typename T>
-std::ostream& operator<<(std::ostream& out, const SO3<T>& so3);
+std::ostream& operator<<(std::ostream& out, const SO3<T>& so3) {
+  out << so3.matrix();
+  return out;
+}
 
-#include <manifold/SO3_impl.hpp>

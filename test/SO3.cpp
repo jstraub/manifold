@@ -3,8 +3,6 @@
 #include <Eigen/Dense>
 #include <manifold/SO3.h>
 
-
-
 int main (int argc, char** argv) {
   
   SO3d R;

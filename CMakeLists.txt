@@ -36,15 +36,35 @@ include_directories(
 link_directories(
 )
 
+add_library(manifold SHARED
+  ./src/SO3.cpp
+  )
+
 add_executable(testSO3GD ./test/SO3GD.cpp)
+target_link_libraries(testSO3GD manifold)
+
 add_executable(testSE3GD ./test/SE3GD.cpp)
+target_link_libraries(testSE3GD manifold)
+
 add_executable(testSO3 ./test/SO3.cpp)
+target_link_libraries(testSO3 manifold)
+
 add_executable(testSE3 ./test/SE3.cpp)
+target_link_libraries(testSE3 manifold)
+
 add_executable(testSO3_incSurfNormAlign ./test/SO3_incSurfNormAlign.cpp)
+target_link_libraries(testSO3_incSurfNormAlign manifold)
+
 add_executable(testS ./test/S.cpp)
+target_link_libraries(testS manifold)
+
 add_executable(testSO3_gmm ./test/SO3_gmm.cpp)
+target_link_libraries(testSO3_gmm manifold)
 
 add_executable(testSE3g2pc ./test/g2pc.cpp)
+target_link_libraries(testSE3g2pc manifold)
+
+
 
 pods_install_executables(testSO3 testS)
 #pods_install_libraries(optRot)
@@ -57,6 +77,6 @@ pods_install_headers(
   ./include/manifold/gradientDescent.h
   ./include/manifold/gradientDescentSO3.h
   ./include/manifold/gradientDescentSE3.h
-  ./include/manifold/SO3_impl.hpp
+#  ./include/manifold/SO3_impl.hpp
   ./include/manifold/SE3_impl.hpp
   DESTINATION manifold)

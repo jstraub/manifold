@@ -1,3 +1,5 @@
+#include <random>
+
 template<typename T>
 SO3<T>::SO3() 
   : R_(Eigen::Matrix<T,3,3>::Identity())
@@ -112,11 +114,6 @@ const SO3<T> SO3<T>::operator+(const Eigen::Matrix<T,3,1>& w) {
 //  return res;
 //}
 
-template<typename T>
-std::ostream& operator<<(std::ostream& out, const SO3<T>& so3) {
-  out << so3.matrix();
-  return out;
-}
 
 template<typename T>
 Eigen::Matrix<T,3,3> SO3<T>::G(uint32_t i) {
@@ -153,3 +150,17 @@ Eigen::Matrix<T,3,3> SO3<T>::G3() {
   G3_(0,1) = -1.;
   return G3_;
 }
+
+template<typename T>
+SO3<T> SO3<T>::Random() {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::normal_distribution<T> normal(0,1);
+  std::uniform_real_distribution<T> unif(0,M_PI);
+  // sample uniformly random point inside the sphere of radius pi in
+  // the axes angle space and map it back to a rotation.
+  Eigen::Matrix<T,3,1> w(normal(gen), normal(gen), normal(gen));
+  w *= unif(gen)/w.norm();
+  return SO3<T>(Exp_(w));
+}
+
