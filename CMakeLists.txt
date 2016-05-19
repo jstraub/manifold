@@ -67,7 +67,7 @@ target_link_libraries(testSE3g2pc manifold)
 
 
 pods_install_executables(testSO3 testS)
-#pods_install_libraries(optRot)
+pods_install_libraries(manifold)
 pods_install_headers(
   ./include/manifold/S.h
   ./include/manifold/S_impl.hpp
